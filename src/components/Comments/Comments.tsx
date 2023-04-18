@@ -107,10 +107,10 @@ export const Comments = () => {
         <Styles.Container>
             <Styles.Top>
                 <Styles.CommentNumber>{`${prettyCommentNumber} комментариев`}</Styles.CommentNumber>
-                <Styles.LikeNumber>
+                <Styles.Likes>
                     <Styles.LikeIcon src={heart} />
-                    <Styles.Likes>{prettyLikeNumber}</Styles.Likes>
-                </Styles.LikeNumber>
+                    <Styles.LikeNumber>{prettyLikeNumber}</Styles.LikeNumber>
+                </Styles.Likes>
             </Styles.Top>
             <Styles.CommentsContainaer>
                 {renderComments(firstLevelComments)}

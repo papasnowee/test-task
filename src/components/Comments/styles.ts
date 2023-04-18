@@ -17,6 +17,10 @@ const Top = styled.div`
     justify-content: space-between;
     margin-bottom: 32px;
     border-bottom: 1px solid rgba(118, 118, 118, 0.13);
+
+    @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
+        margin-bottom: 24px;
+    }
 `;
 const Button = styled.button`
     all: unset;
@@ -69,7 +73,7 @@ const CommentContainer = styled.li<Comment>`
     width: ${(props) => 0.95 ** (props.level - 1) * 100}%;
 `;
 
-const LikeNumber = styled.div`
+const Likes = styled.div`
     display: flex;
     justify-content: space-between;
 `;
@@ -78,6 +82,11 @@ const LikeIcon = styled.img`
     width: 22px;
     height: 22px;
     margin-right: 8px;
+
+    @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
+        width: 20px;
+        height: 20px;
+    }
 `;
 
 const CommentNumber = styled.header`
@@ -85,14 +94,24 @@ const CommentNumber = styled.header`
     font-weight: 700;
     font-size: 16px;
     line-height: 22px;
+
+    @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
+        font-size: 14px;
+        letter-spacing: 0em;
+    }
 `;
 
-const Likes = styled.div`
+const LikeNumber = styled.div`
     color: ${Typography.color.white};
     font-size: 15px;
     font-weight: 700;
     line-height: 23px;
     letter-spacing: 0em;
+
+    @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
+        font-size: 14px;
+        line-height: 21px;
+    }
 `;
 
 export const Styles = {
