@@ -87,20 +87,20 @@ function declOfNum(number: number, titles: string[]) {
     ];
 }
 
-console.log(timeAgo(subtractHours(new Date(), 0.1)));
-console.log(timeAgo(subtractHours(new Date(), 2)));
-console.log(timeAgo(subtractHours(new Date(), 4)));
-console.log(timeAgo(subtractHours(new Date(), 5)));
-console.log(timeAgo(subtractHours(new Date(), 6)));
-console.log(timeAgo(subtractHours(new Date(), 10)));
-console.log(timeAgo(subtractHours(new Date(), 11)));
-console.log(timeAgo(subtractHours(new Date(), 12)));
-console.log(timeAgo(subtractHours(new Date(), 20)));
-console.log(timeAgo(subtractHours(new Date(), 22)));
-console.log(timeAgo(subtractHours(new Date(), 23)));
-console.log(timeAgo(subtractHours(new Date(), 24)));
-console.log(timeAgo(subtractHours(new Date(), 25)));
-console.log(timeAgo(subtractHours(new Date(), 48)));
+// console.log(timeAgo(subtractHours(new Date(), 0.1)));
+// console.log(timeAgo(subtractHours(new Date(), 2)));
+// console.log(timeAgo(subtractHours(new Date(), 4)));
+// console.log(timeAgo(subtractHours(new Date(), 5)));
+// console.log(timeAgo(subtractHours(new Date(), 6)));
+// console.log(timeAgo(subtractHours(new Date(), 10)));
+// console.log(timeAgo(subtractHours(new Date(), 11)));
+// console.log(timeAgo(subtractHours(new Date(), 12)));
+// console.log(timeAgo(subtractHours(new Date(), 20)));
+// console.log(timeAgo(subtractHours(new Date(), 22)));
+// console.log(timeAgo(subtractHours(new Date(), 23)));
+// console.log(timeAgo(subtractHours(new Date(), 24)));
+// console.log(timeAgo(subtractHours(new Date(), 25)));
+// console.log(timeAgo(subtractHours(new Date(), 48)));
 
 // копирует массив объектов
 export function createObjectList<P>(objectList: P[]) {
@@ -130,7 +130,6 @@ export function moveChildrenToParent(arr: IComment[]) {
 }
 
 export const calcLikes = (arr: IComment[]) => {
-    console.log("calc like");
     return arr.reduce((acc, current) => {
         return acc + current.likes;
     }, 0);

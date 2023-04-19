@@ -6,23 +6,30 @@ import {Styles} from "./styles";
 import getAuthorsRequest from "src/api/authors/getAuthorsRequest";
 import getCommentsRequest from "src/api/comments/getCommentsRequest";
 import heart from "./heart.svg";
+import {calcLikes, moveChildrenToParent, sortByDate} from "./utils";
 import {
-    calcLikes,
-    createObjectList,
-    moveChildrenToParent,
-    sortByDate,
-} from "./utils";
-import {Author, AuthorsObj, CommentWithChildren, IComment} from "./types";
+    Author,
+    AuthorsObj,
+    CommentWithChildren,
+    CommentsResponce,
+    IComment,
+} from "./types";
 import {formatNumber} from "src/utils/utils";
 
 export const Comments = () => {
     const [authors, setAuthors] = useState<AuthorsObj>({});
     const [pageNumber, setPageNumber] = useState(1);
-    const [comments, setComments] = useState<IComment[]>([]);
+    const [commentsPerPage, setCommentsPerPage] = useState(0);
+    const [comments, setComments] = useState<IComment[]>([]); // show this comments
+    const [totalPg, setTotalPage] = useState(1);
 
     useEffect(() => {
         async function getAuthors() {
-            const authorsList: Author[] = await getAuthorsRequest();
+            const authorsList: Author[] = await getAuthorsRequest().catch(
+                (err: Error) => {
+                    console.log(`getAuthorsRequest error: ${err}`);
+                },
+            );
             const authorsObj: AuthorsObj = {};
 
             // чтобы быстрее искать авторов по айди
@@ -34,34 +41,53 @@ export const Comments = () => {
         getAuthors();
     }, []);
 
+    //TODO refactoring
     useEffect(() => {
         async function getComments() {
-            const newComments = await getCommentsRequest(pageNumber);
-            setComments([...comments, ...newComments.data]);
+            const firstPage: CommentsResponce = await getCommentsRequest(
+                1,
+            ).catch((err: Error) => {
+                console.log(`getCommentsRequest error: ${err}`);
+            });
+
+            const totalPage: number = firstPage.pagination.total_pages;
+            const responceArray: Promise<CommentsResponce>[] = [];
+
+            for (let i = 2; i <= totalPage; i++) {
+                responceArray.push(getCommentsRequest(i));
+            }
+            const responceArr: CommentsResponce[] =
+                (await Promise.all(responceArray).catch((err) => {
+                    console.log(`getCommentsRequest error: ${err}`);
+                })) ?? [];
+
+            let comments = [...firstPage.data];
+            responceArr.forEach((element: CommentsResponce) => {
+                comments = [...comments, ...element.data];
+            });
+
+            moveChildrenToParent(comments); // TODO должна возвращать новый массив
+            const firstLevelComments = comments.filter((item) => !item.parent);
+
+            sortByDate(firstLevelComments);
+
+            setComments(firstLevelComments);
+            setCommentsPerPage(firstPage.pagination.size);
+            setTotalPage(totalPage);
         }
         getComments();
-    }, [pageNumber]);
-
-    const newComments = createObjectList(comments);
-
-    moveChildrenToParent(newComments);
-
-    const firstLevelComments = newComments.filter((item) => !item.parent);
-    sortByDate(firstLevelComments);
+    }, []);
 
     const handleLike = (commentID: IComment["id"], isLiked: boolean) => {
         const index = comments.findIndex((item) => commentID === item.id);
-        console.log({like: comments[index].likes});
         comments[index].likes = isLiked
             ? comments[index].likes + 1
             : comments[index].likes - 1;
         const newComments = [...comments];
         setComments(newComments);
-
-        console.log({like: comments[index].likes});
     };
 
-    function renderComments(firstLevelList: CommentWithChildren[]) {
+    function renderComments(commentList: CommentWithChildren[]) {
         const list: JSX.Element[] = [];
         function createComment(comment: CommentWithChildren, lvl = 1) {
             list.push(
@@ -86,9 +112,9 @@ export const Comments = () => {
             }
         }
 
-        firstLevelList.forEach((item) => {
-            createComment(item);
-        });
+        for (let i = 0; i < pageNumber * commentsPerPage; i++) {
+            createComment(commentList[i]);
+        }
 
         return list;
     }
@@ -97,9 +123,9 @@ export const Comments = () => {
     const prettyCommentNumber = formatNumber(comments.length);
 
     const handlePress = () => {
-        setPageNumber((prevoiusPageNumber) => {
-            return prevoiusPageNumber + 1;
-        });
+        if (pageNumber + 1 <= totalPg) {
+            setPageNumber(pageNumber + 1);
+        }
     };
 
     return (
@@ -112,7 +138,7 @@ export const Comments = () => {
                 </Styles.Likes>
             </Styles.Top>
             <Styles.CommentsContainaer>
-                {renderComments(firstLevelComments)}
+                {renderComments(comments)}
             </Styles.CommentsContainaer>
             <Styles.Button onClick={handlePress}>Загрузить еще</Styles.Button>
         </Styles.Container>

@@ -20,3 +20,13 @@ export interface IComment {
 export interface CommentWithChildren extends IComment {
     children?: IComment[];
 }
+
+interface Pagination {
+    page: number;
+    size: number;
+    total_pages: number;
+}
+export interface CommentsResponce {
+    data: IComment[];
+    pagination: Pagination;
+}
