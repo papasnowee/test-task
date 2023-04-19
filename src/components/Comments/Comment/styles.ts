@@ -7,8 +7,6 @@ const grayFont = "rgba(130, 151, 171, 1)";
 const avatarHeight = "68px";
 const avatarHeightMobile = "40px";
 
-const likesWidth = "57px";
-
 const Container = styled.article`
     display: flex;
 `;
@@ -29,6 +27,7 @@ const Avatar = styled.img`
 `;
 
 const Wrapper = styled.div`
+    overflow: hidden;
     flex-grow: 1;
 `;
 const NameLikesWrapper = styled.div`
@@ -45,12 +44,7 @@ const NameLikesWrapper = styled.div`
 
 const NameTimeWrapper = styled.header`
     height: 43px;
-    display: flex;
-    max-width: calc(100% - ${likesWidth} - 30px);
-    flex-direction: column;
-    align-items: start;
-    justify-content: space-between;
-    white-space: nowrap;
+    overflow: hidden;
 `;
 
 const Name = styled.div`
@@ -60,6 +54,9 @@ const Name = styled.div`
     color: ${Typography.color.white};
     line-height: 20px;
     height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
         font-size: 14px;
@@ -74,6 +71,9 @@ const Time = styled.div`
     color: ${grayFont};
     line-height: 19px;
     height: 19px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 
     @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
         font-size: 14px;
@@ -114,6 +114,8 @@ const LikesContainer = styled.button`
     all: unset;
     display: flex;
     align-items: center;
+    justify-content: end;
+    margin-left: 33px;
 
     &:hover {
         cursor: pointer;

@@ -65,9 +65,8 @@ export const Comments = () => {
         const list: JSX.Element[] = [];
         function createComment(comment: CommentWithChildren, lvl = 1) {
             list.push(
-                <Styles.CommentContainer level={lvl}>
+                <Styles.CommentContainer key={comment.id} level={lvl}>
                     <Comment
-                        key={comment.id}
                         authorName={authors[comment.author].name}
                         avatar={authors[comment.author].avatar}
                         created={comment.created}
