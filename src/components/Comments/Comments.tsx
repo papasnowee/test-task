@@ -1,94 +1,80 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from 'react'
 
-import {Comment} from "./Comment";
+import { Comment } from './Comment'
 
-import {Styles} from "./styles";
-import getAuthorsRequest from "src/api/authors/getAuthorsRequest";
-import getCommentsRequest from "src/api/comments/getCommentsRequest";
-import heart from "./heart.svg";
-import {calcLikes, moveChildrenToParent, sortByDate} from "./utils";
-import {
-    Author,
-    AuthorsObj,
-    CommentWithChildren,
-    CommentsResponce,
-    IComment,
-} from "./types";
-import {formatNumber} from "src/utils/utils";
+import { Styles } from './styles'
+import getAuthorsRequest from 'src/api/authors/getAuthorsRequest'
+import getCommentsRequest, { CommentsResponce, IComment } from 'src/api/comments/getCommentsRequest'
+import heart from './heart.svg'
+import { calcLikes, moveChildrenToParent, sortByDate } from './utils'
+import { AuthorsObj, CommentWithChildren } from './types'
+import { formatNumber } from 'src/utils/utils'
 
 export const Comments = () => {
-    const [authors, setAuthors] = useState<AuthorsObj>({});
-    const [pageNumber, setPageNumber] = useState(1);
-    const [commentsPerPage, setCommentsPerPage] = useState(0);
-    const [comments, setComments] = useState<IComment[]>([]); // show this comments
-    const [totalPg, setTotalPage] = useState(1);
+    const [authors, setAuthors] = useState<AuthorsObj>({})
+    const [pageNumber, setPageNumber] = useState(1)
+    const [commentsPerPage, setCommentsPerPage] = useState(0)
+    const [comments, setComments] = useState<IComment[]>([])
+    const [totalPg, setTotalPage] = useState(1)
 
     useEffect(() => {
         async function getAuthors() {
-            const authorsList: Author[] = await getAuthorsRequest().catch(
-                (err: Error) => {
-                    console.log(`getAuthorsRequest error: ${err}`);
-                },
-            );
-            const authorsObj: AuthorsObj = {};
+            const authorsList =
+                (await getAuthorsRequest().catch((err: Error) => {
+                    console.log(`getAuthorsRequest error: ${err}`)
+                })) ?? []
+            const authorsObj: AuthorsObj = {}
 
             // чтобы быстрее искать авторов по айди
             authorsList.forEach((author) => {
-                authorsObj[author["id"]] = author;
-            });
-            setAuthors(authorsObj);
+                authorsObj[author['id']] = author
+            })
+            setAuthors(authorsObj)
         }
-        getAuthors();
-    }, []);
+        getAuthors()
+    }, [])
 
     //TODO refactoring
     useEffect(() => {
         async function getComments() {
-            const firstPage: CommentsResponce = await getCommentsRequest(
-                1,
-            ).catch((err: Error) => {
-                console.log(`getCommentsRequest error: ${err}`);
-            });
-
-            const totalPage: number = firstPage.pagination.total_pages;
-            const responceArray: Promise<CommentsResponce>[] = [];
+            const firstPage = await getCommentsRequest(1)
+            const totalPage: number = firstPage.pagination?.total_pages
+            const responceArray: Promise<CommentsResponce>[] = []
 
             for (let i = 2; i <= totalPage; i++) {
-                responceArray.push(getCommentsRequest(i));
+                responceArray.push(getCommentsRequest(i))
             }
             const responceArr: CommentsResponce[] =
                 (await Promise.all(responceArray).catch((err) => {
-                    console.log(`getCommentsRequest error: ${err}`);
-                })) ?? [];
+                    console.log(`getCommentsRequest error: ${err}`)
+                })) ?? []
 
-            let comments = [...firstPage.data];
+            let comments = [...firstPage.data]
             responceArr.forEach((element: CommentsResponce) => {
-                comments = [...comments, ...element.data];
-            });
+                comments = [...comments, ...element.data]
+            })
 
-            moveChildrenToParent(comments); // TODO должна возвращать новый массив
-            const firstLevelComments = comments.filter((item) => !item.parent);
+            moveChildrenToParent(comments) // TODO should return new array
+            const firstLevelComments = comments.filter((item) => !item.parent)
 
-            sortByDate(firstLevelComments);
+            sortByDate(firstLevelComments)
 
-            setComments(firstLevelComments);
-            setCommentsPerPage(firstPage.pagination.size);
-            setTotalPage(totalPage);
+            setComments(firstLevelComments)
+            setCommentsPerPage(firstPage.pagination.size)
+            setTotalPage(totalPage)
         }
-        getComments();
-    }, []);
+        getComments()
+    }, [])
 
-    const handleLike = (commentID: IComment["id"], isLiked: boolean) => {
-        const index = comments.findIndex((item) => commentID === item.id);
-        comments[index].likes = isLiked
-            ? comments[index].likes + 1
-            : comments[index].likes - 1;
-        const newComments = [...comments];
-        setComments(newComments);
-    };
+    const handleLike = (commentID: IComment['id'], isLiked: boolean) => {
+        const index = comments.findIndex((item) => commentID === item.id)
+        comments[index].likes = isLiked ? comments[index].likes + 1 : comments[index].likes - 1
+        const newComments = [...comments]
+        setComments(newComments)
+    }
 
     function renderComments(commentList: CommentWithChildren[]) {
-        const list: JSX.Element[] = [];
+        const list: JSX.Element[] = []
         function createComment(comment: CommentWithChildren, lvl = 1) {
             list.push(
                 <Styles.CommentContainer key={comment.id} level={lvl}>
@@ -99,34 +85,34 @@ export const Comments = () => {
                         text={comment.text}
                         likes={comment.likes}
                         makeLike={(isLiked: boolean) => {
-                            handleLike(comment.id, isLiked);
+                            handleLike(comment.id, isLiked)
                         }}
                     />
                 </Styles.CommentContainer>,
-            );
+            )
             if (comment.children?.length) {
                 comment.children.forEach((child) => {
-                    createComment(child, lvl + 1);
-                });
-                sortByDate(comment.children);
+                    createComment(child, lvl + 1)
+                })
+                sortByDate(comment.children)
             }
         }
 
         for (let i = 0; i < pageNumber * commentsPerPage; i++) {
-            createComment(commentList[i]);
+            createComment(commentList[i])
         }
 
-        return list;
+        return list
     }
 
-    const prettyLikeNumber = formatNumber(calcLikes(comments));
-    const prettyCommentNumber = formatNumber(comments.length);
+    const prettyLikeNumber = formatNumber(calcLikes(comments))
+    const prettyCommentNumber = formatNumber(comments.length)
 
     const handlePress = () => {
         if (pageNumber + 1 <= totalPg) {
-            setPageNumber(pageNumber + 1);
+            setPageNumber(pageNumber + 1)
         }
-    };
+    }
 
     return (
         <Styles.Container>
@@ -137,10 +123,8 @@ export const Comments = () => {
                     <Styles.LikeNumber>{prettyLikeNumber}</Styles.LikeNumber>
                 </Styles.Likes>
             </Styles.Top>
-            <Styles.CommentsContainaer>
-                {renderComments(comments)}
-            </Styles.CommentsContainaer>
+            <Styles.CommentsContainaer>{renderComments(comments)}</Styles.CommentsContainaer>
             <Styles.Button onClick={handlePress}>Загрузить еще</Styles.Button>
         </Styles.Container>
-    );
-};
+    )
+}

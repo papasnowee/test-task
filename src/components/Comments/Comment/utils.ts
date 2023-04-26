@@ -1,1 +1,1 @@
-export const date = () => {};
+export const date = () => {}

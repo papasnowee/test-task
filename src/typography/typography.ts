@@ -1,6 +1,6 @@
 export const Typography = {
     color: {
-        white: "white",
+        white: 'white',
     },
-    fontFamily: {main: "Lato"},
-};
+    fontFamily: { main: 'Lato' },
+}

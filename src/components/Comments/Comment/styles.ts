@@ -1,15 +1,15 @@
-import {ScreenSize} from "src/styles";
-import {Typography} from "src/typography/typography";
-import styled from "styled-components";
+import { ScreenSize } from 'src/styles'
+import { Typography } from 'src/typography/typography'
+import styled from 'styled-components'
 
-const grayFont = "rgba(130, 151, 171, 1)";
+const grayFont = 'rgba(130, 151, 171, 1)'
 
-const avatarHeight = "68px";
-const avatarHeightMobile = "40px";
+const avatarHeight = '68px'
+const avatarHeightMobile = '40px'
 
 const Container = styled.article`
     display: flex;
-`;
+`
 
 const Avatar = styled.img`
     object-fit: cover;
@@ -24,12 +24,12 @@ const Avatar = styled.img`
         width: ${avatarHeightMobile};
         height: ${avatarHeightMobile};
     }
-`;
+`
 
 const Wrapper = styled.div`
     overflow: hidden;
     flex-grow: 1;
-`;
+`
 const NameLikesWrapper = styled.div`
     height: ${avatarHeight};
     display: flex;
@@ -40,12 +40,12 @@ const NameLikesWrapper = styled.div`
         height: ${avatarHeightMobile};
         margin-bottom: 8px;
     }
-`;
+`
 
 const NameTimeWrapper = styled.header`
     height: 43px;
     overflow: hidden;
-`;
+`
 
 const Name = styled.div`
     font-size: 16px;
@@ -62,7 +62,7 @@ const Name = styled.div`
         font-size: 14px;
         line-height: 22px;
     }
-`;
+`
 
 const Time = styled.div`
     font-size: 16px;
@@ -79,7 +79,7 @@ const Time = styled.div`
         font-size: 14px;
         line-height: 16.8px;
     }
-`;
+`
 
 const Text = styled.div`
     font-family: ${Typography.fontFamily.main};
@@ -93,7 +93,7 @@ const Text = styled.div`
         font-size: 14px;
         line-height: 16.8px;
     }
-`;
+`
 
 const Likes = styled.div`
     height: 23px;
@@ -108,7 +108,7 @@ const Likes = styled.div`
         font-size: 14px;
         line-height: 21px;
     }
-`;
+`
 
 const LikesContainer = styled.button`
     all: unset;
@@ -120,7 +120,7 @@ const LikesContainer = styled.button`
     &:hover {
         cursor: pointer;
     }
-`;
+`
 
 const HeartIcon = styled.img`
     margin-right: 8px;
@@ -129,7 +129,7 @@ const HeartIcon = styled.img`
         width: 20px;
         height: 20px;
     }
-`;
+`
 
 export const Styles = {
     HeartIcon,
@@ -143,4 +143,4 @@ export const Styles = {
     Wrapper,
     Container,
     Avatar,
-};
+}

@@ -1,5 +1,5 @@
-import {Comments} from "./components/Comments";
-import {Styles} from "./styles";
+import { Comments } from './components/Comments'
+import { Styles } from './styles'
 
 function App() {
     return (
@@ -8,7 +8,7 @@ function App() {
                 <Comments />
             </Styles.CommentsContainer>
         </Styles.Container>
-    );
+    )
 }
 
-export default App;
+export default App

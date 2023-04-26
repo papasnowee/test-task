@@ -1,15 +1,15 @@
-import {ScreenSize} from "src/styles";
-import {Typography} from "src/typography/typography";
-import styled from "styled-components";
+import { ScreenSize } from 'src/styles'
+import { Typography } from 'src/typography/typography'
+import styled from 'styled-components'
 
 interface Comment {
-    level: number;
+    level: number
 }
 
 const Container = styled.div`
     max-width: 562px;
     font-family: ${Typography.fontFamily.main};
-`;
+`
 const Top = styled.div`
     height: 30px;
     display: flex;
@@ -21,7 +21,7 @@ const Top = styled.div`
     @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
         margin-bottom: 24px;
     }
-`;
+`
 const Button = styled.button`
     all: unset;
     display: block;
@@ -49,7 +49,7 @@ const Button = styled.button`
     &:active {
         background-color: #313439;
     }
-`;
+`
 
 const CommentsContainaer = styled.ul`
     all: unset;
@@ -67,16 +67,16 @@ const CommentsContainaer = styled.ul`
             margin-bottom: 24px;
         }
     }
-`;
+`
 const CommentContainer = styled.li<Comment>`
     all: unset;
     width: ${(props) => 0.95 ** (props.level - 1) * 100}%;
-`;
+`
 
 const Likes = styled.div`
     display: flex;
     justify-content: space-between;
-`;
+`
 
 const LikeIcon = styled.img`
     width: 22px;
@@ -87,7 +87,7 @@ const LikeIcon = styled.img`
         width: 20px;
         height: 20px;
     }
-`;
+`
 
 const CommentNumber = styled.header`
     color: ${Typography.color.white};
@@ -99,7 +99,7 @@ const CommentNumber = styled.header`
         font-size: 14px;
         letter-spacing: 0em;
     }
-`;
+`
 
 const LikeNumber = styled.div`
     color: ${Typography.color.white};
@@ -112,7 +112,7 @@ const LikeNumber = styled.div`
         font-size: 14px;
         line-height: 21px;
     }
-`;
+`
 
 export const Styles = {
     Likes,
@@ -124,4 +124,4 @@ export const Styles = {
     Button,
     CommentsContainaer,
     CommentContainer,
-};
+}
