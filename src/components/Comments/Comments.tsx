@@ -6,9 +6,10 @@ import { Styles } from './styles'
 import getAuthorsRequest from 'src/api/authors/getAuthorsRequest'
 import getCommentsRequest, { CommentsResponce, IComment } from 'src/api/comments/getCommentsRequest'
 import heart from './heart.svg'
-import { calcLikes, moveChildrenToParent, sortByDate } from './utils'
+import { moveChildrenToParent, sortByDate } from './utils'
 import { AuthorsObj, CommentWithChildren } from './types'
 import { formatNumber } from 'src/utils/utils'
+import getLikesAndCommentsNumbersRequest from 'src/api/likesAndCommentsNumbers/getLikesAndCommentsNumbersRequest'
 
 export const Comments = () => {
     const [authors, setAuthors] = useState<AuthorsObj>({})
@@ -16,13 +17,12 @@ export const Comments = () => {
     const [commentsPerPage, setCommentsPerPage] = useState(0)
     const [comments, setComments] = useState<IComment[]>([])
     const [totalPg, setTotalPage] = useState(1)
+    const [likes, setLikes] = useState(0)
+    const [commentsAmmount, setCommentsAmmount] = useState(0)
 
     useEffect(() => {
         async function getAuthors() {
-            const authorsList =
-                (await getAuthorsRequest().catch((err: Error) => {
-                    console.log(`getAuthorsRequest error: ${err}`)
-                })) ?? []
+            const authorsList = await getAuthorsRequest()
             const authorsObj: AuthorsObj = {}
 
             // чтобы быстрее искать авторов по айди
@@ -32,6 +32,16 @@ export const Comments = () => {
             setAuthors(authorsObj)
         }
         getAuthors()
+    }, [])
+
+    useEffect(() => {
+        async function likesAndCommentsNumbers() {
+            const data = await getLikesAndCommentsNumbersRequest()
+
+            setLikes(data.likes)
+            setCommentsAmmount(data.comments)
+        }
+        likesAndCommentsNumbers()
     }, [])
 
     //TODO refactoring
@@ -44,11 +54,7 @@ export const Comments = () => {
             for (let i = 2; i <= totalPage; i++) {
                 responceArray.push(getCommentsRequest(i))
             }
-            const responceArr: CommentsResponce[] =
-                (await Promise.all(responceArray).catch((err) => {
-                    console.log(`getCommentsRequest error: ${err}`)
-                })) ?? []
-
+            const responceArr: CommentsResponce[] = await Promise.all(responceArray)
             let comments = [...firstPage.data]
             responceArr.forEach((element: CommentsResponce) => {
                 comments = [...comments, ...element.data]
@@ -70,6 +76,9 @@ export const Comments = () => {
         const index = comments.findIndex((item) => commentID === item.id)
         comments[index].likes = isLiked ? comments[index].likes + 1 : comments[index].likes - 1
         const newComments = [...comments]
+        setLikes((previousLikes) => {
+            return isLiked ? previousLikes + 1 : previousLikes - 1
+        })
         setComments(newComments)
     }
 
@@ -105,8 +114,8 @@ export const Comments = () => {
         return list
     }
 
-    const prettyLikeNumber = formatNumber(calcLikes(comments))
-    const prettyCommentNumber = formatNumber(comments.length)
+    const prettyLikeNumber = formatNumber(likes)
+    const prettyCommentNumber = formatNumber(commentsAmmount)
 
     const handlePress = () => {
         if (pageNumber + 1 <= totalPg) {
@@ -117,14 +126,14 @@ export const Comments = () => {
     return (
         <Styles.Container>
             <Styles.Top>
-                <Styles.CommentNumber>{`${prettyCommentNumber} комментариев`}</Styles.CommentNumber>
+                <Styles.CommentNumber>{`${prettyCommentNumber} comments`}</Styles.CommentNumber>
                 <Styles.Likes>
                     <Styles.LikeIcon src={heart} />
                     <Styles.LikeNumber>{prettyLikeNumber}</Styles.LikeNumber>
                 </Styles.Likes>
             </Styles.Top>
             <Styles.CommentsContainaer>{renderComments(comments)}</Styles.CommentsContainaer>
-            <Styles.Button onClick={handlePress}>Загрузить еще</Styles.Button>
+            <Styles.Button onClick={handlePress}>Download more</Styles.Button>
         </Styles.Container>
     )
 }

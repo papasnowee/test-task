@@ -10,7 +10,7 @@ const useMockAdapter = () => {
     mock.onGet('/api/authors').reply(200, authors)
 
     // comments number, likes number
-    mock.onGet('/api/comments/likesAndComments').reply(200, {
+    mock.onGet('/api/comments/likesAndCommentsNumber').reply(200, {
         comments: 29,
         likes: 3333,
     })
