@@ -4,11 +4,11 @@ import { Comment } from './Comment'
 
 import { Styles } from './styles'
 import getAuthorsRequest from 'src/api/authors/getAuthorsRequest'
-import getCommentsRequest, { CommentsResponce, IComment } from 'src/api/comments/getCommentsRequest'
+import getCommentsRequest, { IComment } from 'src/api/comments/getCommentsRequest'
 import heart from './heart.svg'
-import { moveChildrenToParent, sortByDate } from './utils'
+import { moveChildrenToParent, sortByDate, updateLikeInComment } from './utils'
 import { AuthorsObj, CommentWithChildren } from './types'
-import { formatNumber } from 'src/utils/utils'
+import { prettifyNumber } from 'src/utils/utils'
 import getLikesAndCommentsNumbersRequest from 'src/api/likesAndCommentsNumbers/getLikesAndCommentsNumbersRequest'
 import { useApiRequest } from 'src/services/useApiRequest'
 
@@ -87,13 +87,10 @@ export const Comments = () => {
     }, [page])
 
     const handleLike = (commentID: IComment['id'], isLiked: boolean) => {
-        const index = comments.findIndex((item) => commentID === item.id)
-        comments[index].likes = isLiked ? comments[index].likes + 1 : comments[index].likes - 1
-        const newComments = [...comments]
+        updateLikeInComment(commentID, comments, isLiked, setComments)
         setLikes((previousLikes) => {
             return isLiked ? previousLikes + 1 : previousLikes - 1
         })
-        setComments(newComments)
     }
 
     function renderComments(commentList: CommentWithChildren[]) {
@@ -129,8 +126,8 @@ export const Comments = () => {
         return list
     }
 
-    const prettyLikeNumber = formatNumber(likes)
-    const prettyCommentNumber = formatNumber(commentsAmmount)
+    const prettyLikeNumber = prettifyNumber(likes)
+    const prettyCommentNumber = prettifyNumber(commentsAmmount)
 
     const handlePress = () => {
         sendCommentsRequest(pageNumber + 1)

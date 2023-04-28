@@ -55,3 +55,21 @@ export function moveChildrenToParent(arr: IComment[]) {
         }
     })
 }
+
+export function updateLikeInComment(
+    id: number,
+    comments: CommentWithChildren[],
+    isLiked: boolean,
+    updateFunction: any,
+) {
+    function updateComment(comment: CommentWithChildren) {
+        if (comment.id === id) {
+            comment.likes = isLiked ? comment.likes + 1 : comment.likes - 1
+            updateFunction(comments)
+        }
+        comment.children?.forEach((children) => {
+            updateComment(children)
+        })
+    }
+    comments.forEach(updateComment)
+}

@@ -3,7 +3,7 @@ import { Styles } from './styles'
 import filledHeart from './icons/filledHeart.svg'
 import emptyHeart from './icons/emptyHeart.svg'
 import { timeAgo } from '../utils'
-import { formatNumber } from 'src/utils/utils'
+import { prettifyNumber } from 'src/utils/utils'
 
 interface Props {
     authorName: string
@@ -37,7 +37,7 @@ export const Comment: FC<Props> = (props) => {
                         {isLiked && <Styles.HeartIcon src={filledHeart} />}
                         {!isLiked && <Styles.HeartIcon src={emptyHeart} />}
 
-                        <Styles.Likes>{formatNumber(likes)}</Styles.Likes>
+                        <Styles.Likes>{prettifyNumber(likes)}</Styles.Likes>
                     </Styles.LikesContainer>
                 </Styles.NameLikesWrapper>
                 <Styles.Text>{text}</Styles.Text>

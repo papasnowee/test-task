@@ -6,7 +6,7 @@ interface Pagination {
     size: number
     total_pages: number
 }
-export interface CommentsResponce {
+interface CommentsResponce {
     data: IComment[]
     pagination: Pagination
 }
