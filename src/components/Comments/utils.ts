@@ -41,7 +41,7 @@ export function timeAgo(date: Date) {
     }
 }
 
-// копирует элементы детей в объекты родителей
+// copies children to parent
 export function moveChildrenToParent(arr: IComment[]) {
     arr.forEach((comment) => {
         if (comment.parent) {

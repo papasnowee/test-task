@@ -10,28 +10,49 @@ import { moveChildrenToParent, sortByDate } from './utils'
 import { AuthorsObj, CommentWithChildren } from './types'
 import { formatNumber } from 'src/utils/utils'
 import getLikesAndCommentsNumbersRequest from 'src/api/likesAndCommentsNumbers/getLikesAndCommentsNumbersRequest'
+import { useApiRequest } from 'src/services/useApiRequest'
 
 export const Comments = () => {
     const [authors, setAuthors] = useState<AuthorsObj>({})
-    const [pageNumber, setPageNumber] = useState(1)
-    const [commentsPerPage, setCommentsPerPage] = useState(0)
+    const [pageNumber, setPageNumber] = useState(0)
     const [comments, setComments] = useState<IComment[]>([])
     const [totalPg, setTotalPage] = useState(1)
     const [likes, setLikes] = useState(0)
     const [commentsAmmount, setCommentsAmmount] = useState(0)
 
-    useEffect(() => {
-        async function getAuthors() {
-            const authorsList = await getAuthorsRequest()
-            const authorsObj: AuthorsObj = {}
+    const {
+        loading: authorLoading,
+        loaded: authorsList,
+        error: authorsError,
+        sendRequest: sendAuthorsRequest,
+    } = useApiRequest(getAuthorsRequest)
 
-            // чтобы быстрее искать авторов по айди
+    const {
+        loading: pageLoading,
+        loaded: page,
+        error: pageError,
+        sendRequest: sendCommentsRequest,
+    } = useApiRequest(getCommentsRequest)
+
+    // const {
+    //     loading: getAuthorLoading,
+    //     loaded: authorsList,
+    //     error: getAuthorsError,
+    //     sendRequest: sendAuthorsRequest,
+    // } = useApiRequest(getAuthorsRequest)
+    useEffect(() => {
+        const authorsObj: AuthorsObj = {}
+        if (authorsList) {
+            // for faster searching
             authorsList.forEach((author) => {
                 authorsObj[author['id']] = author
             })
             setAuthors(authorsObj)
         }
-        getAuthors()
+    }, [authorsList])
+
+    useEffect(() => {
+        sendAuthorsRequest()
     }, [])
 
     useEffect(() => {
@@ -44,33 +65,26 @@ export const Comments = () => {
         likesAndCommentsNumbers()
     }, [])
 
-    //TODO refactoring
     useEffect(() => {
-        async function getComments() {
-            const firstPage = await getCommentsRequest(1)
-            const totalPage: number = firstPage.pagination?.total_pages
-            const responceArray: Promise<CommentsResponce>[] = []
+        sendCommentsRequest(1)
+    }, [])
 
-            for (let i = 2; i <= totalPage; i++) {
-                responceArray.push(getCommentsRequest(i))
-            }
-            const responceArr: CommentsResponce[] = await Promise.all(responceArray)
-            let comments = [...firstPage.data]
-            responceArr.forEach((element: CommentsResponce) => {
-                comments = [...comments, ...element.data]
-            })
-
-            moveChildrenToParent(comments) // TODO should return new array
-            const firstLevelComments = comments.filter((item) => !item.parent)
+    useEffect(() => {
+        if (page) {
+            const totalPage: number = page.pagination.total_pages
+            moveChildrenToParent(page.data)
+            const firstLevelComments = page.data.filter((item) => !item.parent)
 
             sortByDate(firstLevelComments)
-
-            setComments(firstLevelComments)
-            setCommentsPerPage(firstPage.pagination.size)
+            setComments((previousComments) => {
+                return [...previousComments, ...firstLevelComments]
+            })
             setTotalPage(totalPage)
+            setPageNumber((previousPageNumber) => {
+                return previousPageNumber + 1
+            })
         }
-        getComments()
-    }, [])
+    }, [page])
 
     const handleLike = (commentID: IComment['id'], isLiked: boolean) => {
         const index = comments.findIndex((item) => commentID === item.id)
@@ -84,8 +98,8 @@ export const Comments = () => {
 
     function renderComments(commentList: CommentWithChildren[]) {
         const list: JSX.Element[] = []
-        function createComment(comment: CommentWithChildren, lvl = 1) {
-            list.push(
+        function addJSXCommentAndItsChildrenToList(comment: CommentWithChildren, lvl = 1) {
+            const commentJSX = (
                 <Styles.CommentContainer key={comment.id} level={lvl}>
                     <Comment
                         authorName={authors[comment.author].name}
@@ -97,19 +111,20 @@ export const Comments = () => {
                             handleLike(comment.id, isLiked)
                         }}
                     />
-                </Styles.CommentContainer>,
+                </Styles.CommentContainer>
             )
+            list.push(commentJSX)
             if (comment.children?.length) {
-                comment.children.forEach((child) => {
-                    createComment(child, lvl + 1)
-                })
                 sortByDate(comment.children)
+                comment.children.forEach((child) => {
+                    addJSXCommentAndItsChildrenToList(child, lvl + 1)
+                })
             }
         }
 
-        for (let i = 0; i < pageNumber * commentsPerPage; i++) {
-            createComment(commentList[i])
-        }
+        commentList.forEach((comment) => {
+            addJSXCommentAndItsChildrenToList(comment)
+        })
 
         return list
     }
@@ -118,10 +133,10 @@ export const Comments = () => {
     const prettyCommentNumber = formatNumber(commentsAmmount)
 
     const handlePress = () => {
-        if (pageNumber + 1 <= totalPg) {
-            setPageNumber(pageNumber + 1)
-        }
+        sendCommentsRequest(pageNumber + 1)
     }
+
+    const isShownButton = pageNumber === totalPg ? false : true
 
     return (
         <Styles.Container>
@@ -133,7 +148,7 @@ export const Comments = () => {
                 </Styles.Likes>
             </Styles.Top>
             <Styles.CommentsContainaer>{renderComments(comments)}</Styles.CommentsContainaer>
-            <Styles.Button onClick={handlePress}>Download more</Styles.Button>
+            {isShownButton && <Styles.Button onClick={handlePress}>Download more</Styles.Button>}
         </Styles.Container>
     )
 }
