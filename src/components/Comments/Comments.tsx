@@ -34,12 +34,13 @@ export const Comments = () => {
         sendRequest: sendCommentsRequest,
     } = useApiRequest(getCommentsRequest)
 
-    // const {
-    //     loading: getAuthorLoading,
-    //     loaded: authorsList,
-    //     error: getAuthorsError,
-    //     sendRequest: sendAuthorsRequest,
-    // } = useApiRequest(getAuthorsRequest)
+    const {
+        loading: likesAndCommentsNumbersLoading,
+        loaded: likesAndCommentsNumbers,
+        error: likesAndCommentsNumbersError,
+        sendRequest: sendLikesAndCommentsNumbersRequest,
+    } = useApiRequest(getLikesAndCommentsNumbersRequest)
+
     useEffect(() => {
         const authorsObj: AuthorsObj = {}
         if (authorsList) {
@@ -56,14 +57,15 @@ export const Comments = () => {
     }, [])
 
     useEffect(() => {
-        async function likesAndCommentsNumbers() {
-            const data = await getLikesAndCommentsNumbersRequest()
-
-            setLikes(data.likes)
-            setCommentsAmmount(data.comments)
-        }
-        likesAndCommentsNumbers()
+        sendLikesAndCommentsNumbersRequest()
     }, [])
+
+    useEffect(() => {
+        if (likesAndCommentsNumbers) {
+            setLikes(likesAndCommentsNumbers.likes)
+            setCommentsAmmount(likesAndCommentsNumbers.comments)
+        }
+    }, [likesAndCommentsNumbers])
 
     useEffect(() => {
         sendCommentsRequest(1)
