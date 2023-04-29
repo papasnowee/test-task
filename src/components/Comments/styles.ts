@@ -9,6 +9,7 @@ interface Comment {
 const Container = styled.div`
     max-width: 562px;
     font-family: ${Typography.fontFamily.main};
+    overflow: hidden;
 `
 const Top = styled.div`
     height: 30px;
@@ -57,6 +58,7 @@ const CommentsContainaer = styled.ul`
     align-items: end;
     flex-direction: column;
     margin-bottom: 60px;
+    overflow: hidden;
 
     > li {
         margin-bottom: 32px;

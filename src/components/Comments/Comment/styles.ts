@@ -18,7 +18,6 @@ const Avatar = styled.img`
     height: ${avatarHeight};
     margin-right: 20px;
     flex-shrink: 0;
-    overflow: hidden;
 
     @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
         width: ${avatarHeightMobile};
@@ -103,6 +102,7 @@ const Likes = styled.div`
     font-weight: 700;
     font-size: 15px;
     line-height: 150%;
+    width: max-content;
 
     @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
         font-size: 14px;
