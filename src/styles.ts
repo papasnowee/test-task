@@ -11,6 +11,7 @@ const CommentsContainer = styled.div`
     margin-bottom: 64px;
     margin-left: 24px;
     margin-right: 24px;
+    overflow: hidden;
 `
 
 export const Styles = {

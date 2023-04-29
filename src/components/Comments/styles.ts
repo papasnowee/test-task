@@ -50,6 +50,10 @@ const Button = styled.button`
     &:active {
         background-color: #313439;
     }
+
+    @media (max-width: ${ScreenSize.MOBILE_WIDTH}) {
+        width: 190px;
+    }
 `
 
 const CommentsContainaer = styled.ul`
